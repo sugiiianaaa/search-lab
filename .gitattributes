@@ -1,0 +1,8 @@
+# Normalise to LF in the repo and on checkout, whatever the contributor's OS or
+# core.autocrlf says. Matches end_of_line in .editorconfig; without this, one Windows
+# checkout and a `dotnet format` can rewrite every line of every file in a single diff.
+* text=auto eol=lf
+
+# Windows-only scripts must stay CRLF to run under cmd.exe.
+*.cmd text eol=crlf
+*.bat text eol=crlf

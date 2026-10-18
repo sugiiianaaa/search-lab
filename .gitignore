@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+*.user
+
+# Ingested corpus: reproducible from the API, far too big for git.
+data/raw/
+data/index/
+*.log
+.env

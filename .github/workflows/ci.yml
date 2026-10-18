@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A newer push to the same branch makes the running build pointless.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - run: dotnet restore
+
+      # TreatWarningsAsErrors is on in Directory.Build.props, so this step is also the lint.
+      - run: dotnet build --configuration Release --no-restore
+
+      # Needs no network, Docker or prebuilt index: the Lucene tests build their own in a temp
+      # directory, and the API tests run against a deliberately missing one.
+      - run: dotnet test --configuration Release --no-build

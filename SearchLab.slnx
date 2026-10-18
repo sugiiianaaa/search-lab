@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SearchLab.Api/SearchLab.Api.csproj" />
+    <Project Path="src/SearchLab.Cli/SearchLab.Cli.csproj" />
+    <Project Path="src/SearchLab.Core/SearchLab.Core.csproj" />
+    <Project Path="src/SearchLab.Ingest/SearchLab.Ingest.csproj" />
+    <Project Path="src/SearchLab.Search.Lucene/SearchLab.Search.Lucene.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SearchLab.IntegrationTests/SearchLab.IntegrationTests.csproj" />
+    <Project Path="tests/SearchLab.UnitTests/SearchLab.UnitTests.csproj" />
+  </Folder>
+</Solution>
