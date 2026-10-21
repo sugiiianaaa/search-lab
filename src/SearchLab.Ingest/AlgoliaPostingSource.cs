@@ -7,16 +7,15 @@ namespace SearchLab.Ingest;
 
 public sealed class AlgoliaPostingSource(HttpClient httpClient, ILogger<AlgoliaPostingSource> logger)
 {
-    private const int _hiringThreadId = 49522897; // Ask HN: Who is hiring? (September 2026)
     private const int _postingsPerPage = 30;
     private const int _maxLoggedBodyLength = 500;
 
     private readonly HttpClient _httpClient = httpClient;
     private readonly ILogger<AlgoliaPostingSource> _logger = logger;
 
-    public async Task<Result<RawPostingPage>> FetchPageAsync(int page, CancellationToken cancellationToken)
+    public async Task<Result<RawPostingPage>> FetchPageAsync(int page, int threadId, CancellationToken cancellationToken)
     {
-        string uri = CommentsUri(page);
+        string uri = CommentsUri(page, threadId);
 
         Result<string> body = await DownloadAsync(uri, cancellationToken);
         if (!body.IsSuccess)
@@ -30,7 +29,7 @@ public sealed class AlgoliaPostingSource(HttpClient httpClient, ILogger<AlgoliaP
             return algoliaPage.Error;
         }
 
-        return KeepPostings(page, algoliaPage.Value);
+        return KeepPostings(page, threadId, algoliaPage.Value);
     }
 
     private async Task<Result<string>> DownloadAsync(string uri, CancellationToken cancellationToken)
@@ -90,13 +89,13 @@ public sealed class AlgoliaPostingSource(HttpClient httpClient, ILogger<AlgoliaP
         return algoliaPage;
     }
 
-    private RawPostingPage KeepPostings(int page, AlgoliaPage<AlgoliaCommentHit> algoliaPage)
+    private RawPostingPage KeepPostings(int page, int threadId, AlgoliaPage<AlgoliaCommentHit> algoliaPage)
     {
         List<RawPosting> postings = [];
 
         foreach (AlgoliaCommentHit hit in algoliaPage.Hits)
         {
-            if (ToPosting(hit) is RawPosting posting)
+            if (ToPosting(hit, threadId) is RawPosting posting)
             {
                 postings.Add(posting);
             }
@@ -104,15 +103,15 @@ public sealed class AlgoliaPostingSource(HttpClient httpClient, ILogger<AlgoliaP
 
         bool isLastPage = algoliaPage.Hits.Count == 0 || algoliaPage.Page >= algoliaPage.NbPages - 1;
 
-        IngestLog.PageFetched(_logger, page, _hiringThreadId, algoliaPage.Hits.Count, postings.Count, isLastPage);
+        IngestLog.PageFetched(_logger, page, threadId, algoliaPage.Hits.Count, postings.Count, isLastPage);
 
         return new RawPostingPage(postings, isLastPage);
     }
 
-    private static RawPosting? ToPosting(AlgoliaCommentHit hit)
+    private static RawPosting? ToPosting(AlgoliaCommentHit hit, int threadId)
     {
         bool isDeletedOrFlagged = hit.CommentText is null;
-        bool isReply = hit.ParentId != _hiringThreadId;
+        bool isReply = hit.ParentId != threadId;
 
         if (isDeletedOrFlagged || isReply)
         {
@@ -121,13 +120,13 @@ public sealed class AlgoliaPostingSource(HttpClient httpClient, ILogger<AlgoliaP
 
         return new RawPosting(
             hit.ObjectId,
-            _hiringThreadId,
+            threadId,
             hit.CommentText!,
             DateTimeOffset.FromUnixTimeSeconds(hit.CreatedAtI));
     }
 
-    private static string CommentsUri(int page) =>
-        $"search_by_date?tags=comment,story_{_hiringThreadId}&page={page}&hitsPerPage={_postingsPerPage}";
+    private static string CommentsUri(int page, int threadId) =>
+        $"search_by_date?tags=comment,story_{threadId}&page={page}&hitsPerPage={_postingsPerPage}";
 
     private static string Truncate(string body) =>
         body.Length > _maxLoggedBodyLength ? body[.._maxLoggedBodyLength] + "…" : body;

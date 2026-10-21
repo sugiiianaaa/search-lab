@@ -19,6 +19,7 @@ return args.FirstOrDefault() switch
 
 static async Task<int> FetchAsync(string postingsPath, CancellationToken cancellationToken)
 {
+    int threadId = 49922569;
     using ILoggerFactory loggerFactory = LoggerFactory.Create(logging => logging.AddSimpleConsole(options => options.SingleLine = true));
     using HttpClient httpClient = CreateAlgoliaClient(loggerFactory);
 
@@ -35,7 +36,7 @@ static async Task<int> FetchAsync(string postingsPath, CancellationToken cancell
     {
         while (true)
         {
-            Result<RawPostingPage> fetched = await source.FetchPageAsync(page, cancellationToken);
+            Result<RawPostingPage> fetched = await source.FetchPageAsync(page, threadId, cancellationToken);
             if (!fetched.IsSuccess)
             {
                 await Console.Error.WriteLineAsync($"Fetch failed on page {page}: {fetched.Error.Message}");
