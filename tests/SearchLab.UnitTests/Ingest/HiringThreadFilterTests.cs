@@ -6,7 +6,7 @@ public sealed class HiringThreadFilterTests
 {
     [Theory]
     [InlineData("Ask HN: Who is hiring? (November 2026)")]
-    [InlineData("Ask HN: Who is hiring? (Marcg 2026)")]
+    [InlineData("Ask HN: Who is hiring? (March 2026)")]
     public void IsHiringThread_HiringTitle_ReturnsTrue(string title)
     {
         Assert.True(HiringThreadFilter.IsHiringThread(title));
