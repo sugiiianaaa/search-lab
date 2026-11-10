@@ -1,3 +1,3 @@
 namespace SearchLab.Ingest;
 
-public sealed record HiringThread(int Id, int Year, int Month);
+public sealed record HiringThread(int Id, string Title, int Year, int Month);

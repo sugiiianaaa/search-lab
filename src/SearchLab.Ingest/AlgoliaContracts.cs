@@ -12,3 +12,9 @@ internal sealed record AlgoliaCommentHit(
     [property: JsonPropertyName("comment_text")] string? CommentText,
     [property: JsonPropertyName("created_at_i")] long CreatedAtI,
     [property: JsonPropertyName("parent_id")] int ParentId);
+
+internal sealed record AlgoliaThreadHit(
+    [property: JsonPropertyName("author")] string Author,
+    [property: JsonPropertyName("created_at_i")] long CreatedAtI,
+    [property: JsonPropertyName("story_id")] int StoryId,
+    [property: JsonPropertyName("title")] string Title);
