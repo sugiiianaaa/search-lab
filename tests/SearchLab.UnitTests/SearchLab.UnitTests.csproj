@@ -17,4 +17,8 @@
     <ProjectReference Include="..\..\src\SearchLab.Api\SearchLab.Api.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Ingest\Fixtures\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

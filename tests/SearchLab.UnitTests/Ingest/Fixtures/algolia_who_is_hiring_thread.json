@@ -1,0 +1,131 @@
+{
+    "hits": [
+        {
+            "_tags": [
+                "story",
+                "author_whoishiring",
+                "story_22665398",
+                "ask_hn"
+            ],
+            "author": "whoishiring",
+            "created_at": "2020-03-23T16:13:49Z",
+            "created_at_i": 1584980029,
+            "num_comments": 781,
+            "objectID": "22665398",
+            "points": 1083,
+            "story_id": 22665398,
+            "title": "Ask HN: Who is hiring right now?",
+            "updated_at": "2026-10-27T11:57:53Z"
+        },
+        {
+            "_tags": [
+                "story",
+                "author_whoishiring",
+                "story_90000001",
+                "ask_hn"
+            ],
+            "author": "whoishiring",
+            "created_at": "2019-02-01T16:00:00Z",
+            "created_at_i": 1549036800,
+            "num_comments": 0,
+            "objectID": "90000001",
+            "points": 1,
+            "story_id": 90000001,
+            "title": "Ask HN: Freelancer? Seeking freelancer? (February 2019)",
+            "updated_at": "2019-02-01T16:00:00Z"
+        },
+        {
+            "_tags": [
+                "story",
+                "author_whoishiring",
+                "story_90000002",
+                "ask_hn"
+            ],
+            "author": "whoishiring",
+            "created_at": "2019-02-01T15:59:50Z",
+            "created_at_i": 1549036790,
+            "num_comments": 0,
+            "objectID": "90000002",
+            "points": 1,
+            "story_id": 90000002,
+            "title": "Ask HN: Who wants to be hired? (February 2019)",
+            "updated_at": "2019-02-01T15:59:50Z"
+        },
+        {
+            "_tags": [
+                "story",
+                "author_someoneelse",
+                "story_90000003",
+                "ask_hn"
+            ],
+            "author": "someoneelse",
+            "created_at": "2019-02-01T15:59:40Z",
+            "created_at_i": 1549036780,
+            "num_comments": 0,
+            "objectID": "90000003",
+            "points": 1,
+            "story_id": 90000003,
+            "title": "Ask HN: Who is hiring? (February 2019)",
+            "updated_at": "2019-02-01T15:59:40Z"
+        },
+        {
+            "_tags": [
+                "story",
+                "author_whoishiring",
+                "story_18807017",
+                "ask_hn"
+            ],
+            "author": "whoishiring",
+            "created_at": "2019-01-02T16:01:50Z",
+            "created_at_i": 1546444910,
+            "num_comments": 951,
+            "objectID": "18807017",
+            "points": 587,
+            "story_id": 18807017,
+            "title": "Ask HN: Who is hiring? (January 2019)",
+            "updated_at": "2026-06-14T15:37:42Z"
+        },
+        {
+            "_tags": [
+                "story",
+                "author_whoishiring",
+                "story_15824597",
+                "ask_hn"
+            ],
+            "author": "whoishiring",
+            "created_at": "2017-12-01T16:01:11Z",
+            "created_at_i": 1512144071,
+            "num_comments": 982,
+            "objectID": "15824597",
+            "points": 592,
+            "story_id": 15824597,
+            "title": "Ask HN: Who is hiring? (December 2017)",
+            "updated_at": "2026-09-03T14:15:19Z"
+        },
+        {
+            "_tags": [
+                "story",
+                "author_whoishiring",
+                "story_15601729",
+                "ask_hn"
+            ],
+            "author": "whoishiring",
+            "created_at": "2017-11-01T15:01:13Z",
+            "created_at_i": 1509548473,
+            "num_comments": 1180,
+            "objectID": "15601729",
+            "points": 624,
+            "story_id": 15601729,
+            "title": "Ask HN: Who is hiring? (November 2017)",
+            "updated_at": "2026-09-03T14:15:19Z"
+        }
+    ],
+    "hitsPerPage": 20,
+    "nbHits": 7,
+    "nbPages": 1,
+    "page": 0,
+    "query": "",
+    "params": "tags=story%2Cauthor_whoishiring",
+    "exhaustiveNbHits": true,
+    "processingTimeMS": 1
+}
