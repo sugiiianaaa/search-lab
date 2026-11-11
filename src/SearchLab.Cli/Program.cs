@@ -19,60 +19,39 @@ return args.FirstOrDefault() switch
 
 static async Task<int> FetchAsync(string postingsPath, CancellationToken cancellationToken)
 {
-    int threadId = 49922569;
     using ILoggerFactory loggerFactory = LoggerFactory.Create(logging => logging.AddSimpleConsole(options => options.SingleLine = true));
     using HttpClient httpClient = CreateAlgoliaClient(loggerFactory);
 
-    AlgoliaPostingSource source = new(httpClient, loggerFactory.CreateLogger<AlgoliaPostingSource>());
-    FileRawPostingStore store = new(postingsPath);
+    string checkpointsPath = Path.Combine(Path.GetDirectoryName(postingsPath)!, "checkpoints");
 
-    string nextPagePath = Path.ChangeExtension(postingsPath, ".page");
-    int page = await ReadNextPageAsync(nextPagePath, cancellationToken);
-    int stored = 0;
+    IngestCommand ingest = new(
+        new AlgoliaHiringThreadSource(httpClient, loggerFactory.CreateLogger<AlgoliaHiringThreadSource>()),
+        new AlgoliaPostingSource(httpClient, loggerFactory.CreateLogger<AlgoliaPostingSource>()),
+        new FileRawPostingStore(postingsPath),
+        new PageCheckpoints(checkpointsPath));
 
     Console.WriteLine($"Postings file: {postingsPath}");
 
-    try
+    return await ingest.RunAsync(threadCount: 6, cancellationToken);
+}
+
+static HttpClient CreateAlgoliaClient(ILoggerFactory loggerFactory)
+{
+    ThrottlingRetryHandler handler = new(TimeSpan.FromMilliseconds(250), maxAttempts: 4, loggerFactory.CreateLogger<ThrottlingRetryHandler>())
     {
-        while (true)
-        {
-            Result<RawPostingPage> fetched = await source.FetchPageAsync(page, threadId, cancellationToken);
-            if (!fetched.IsSuccess)
-            {
-                await Console.Error.WriteLineAsync($"Fetch failed on page {page}: {fetched.Error.Message}");
-                return 1;
-            }
+        InnerHandler = new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(2) },
+    };
 
-            Result<int> saved = await store.SaveAsync(fetched.Value.Postings, cancellationToken);
-            if (!saved.IsSuccess)
-            {
-                await Console.Error.WriteLineAsync($"Save failed on page {page}: {saved.Error.Message}");
-                return 1;
-            }
-
-            stored += saved.Value;
-            Console.WriteLine($"Page {page}: {saved.Value} new postings ({stored} total).");
-
-            if (fetched.Value.IsLastPage)
-            {
-                // Postings arrive newest first, so the next run starts again at page 0.
-                File.Delete(nextPagePath);
-                break;
-            }
-
-            // Only after the page is stored, so a killed run resumes at the same page.
-            page++;
-            await File.WriteAllTextAsync(nextPagePath, page.ToString(CultureInfo.InvariantCulture), cancellationToken);
-        }
-    }
-    catch (OperationCanceledException)
+    HttpClient httpClient = new(handler)
     {
-        Console.WriteLine($"Cancelled at page {page}. {stored} stored this run. Re-run to resume.");
-        return 130;
-    }
+        // The trailing slash matters: without it, requests go to /api/search instead of /api/v1/search.
+        BaseAddress = new Uri("https://hn.algolia.com/api/v1/"),
+        Timeout = TimeSpan.FromSeconds(30),
+    };
 
-    Console.WriteLine($"Done. {stored} postings stored this run.");
-    return 0;
+    httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("SearchLab (+https://github.com/sugiiianaaa/search-lab)");
+
+    return httpClient;
 }
 
 static async Task<int> IndexAsync(string postingsPath, string indexPath, CancellationToken cancellationToken)
@@ -117,24 +96,7 @@ static async Task<int> SearchAsync(string indexPath)
     return 0;
 }
 
-static HttpClient CreateAlgoliaClient(ILoggerFactory loggerFactory)
-{
-    ThrottlingRetryHandler handler = new(TimeSpan.FromMilliseconds(250), maxAttempts: 4, loggerFactory.CreateLogger<ThrottlingRetryHandler>())
-    {
-        InnerHandler = new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(2) },
-    };
 
-    HttpClient httpClient = new(handler)
-    {
-        // The trailing slash matters: without it, requests go to /api/search instead of /api/v1/search.
-        BaseAddress = new Uri("https://hn.algolia.com/api/v1/"),
-        Timeout = TimeSpan.FromSeconds(30),
-    };
-
-    httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("SearchLab (+https://github.com/sugiiianaaa/search-lab)");
-
-    return httpClient;
-}
 
 static CancellationToken CancelOnCtrlC()
 {
@@ -149,18 +111,6 @@ static CancellationToken CancelOnCtrlC()
     return cts.Token;
 }
 
-static async Task<int> ReadNextPageAsync(string nextPagePath, CancellationToken cancellationToken)
-{
-    if (!File.Exists(nextPagePath))
-    {
-        return 0;
-    }
-
-    int page = int.Parse(await File.ReadAllTextAsync(nextPagePath, cancellationToken), CultureInfo.InvariantCulture);
-    Console.WriteLine($"Resuming from page {page}.");
-
-    return page;
-}
 
 static int PrintUsage()
 {
