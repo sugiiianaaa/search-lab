@@ -8,3 +8,6 @@ data/raw/
 data/index/
 *.log
 .env
+
+# Text editor configuration
+.zed
